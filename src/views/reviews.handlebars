@@ -1,0 +1,15 @@
+<h2>Todas las Reseñas</h2>
+
+{{#if reviews.length}}
+  <ul>
+    {{#each reviews}}
+      <li>
+        <strong>{{this.usuario.nombre}}</strong> reseñó
+        <em>{{this.restaurante.nombre}}</em>:
+        "{{this.comentario}}" ({{this.calificacion}}⭐)
+      </li>
+    {{/each}}
+  </ul>
+{{else}}
+  <p>No hay reseñas registradas</p>
+{{/if}}

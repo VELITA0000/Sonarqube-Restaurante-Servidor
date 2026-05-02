@@ -1,0 +1,34 @@
+<h2>{{restaurante.nombre}}</h2>
+<p><strong>Dirección:</strong> {{restaurante.direccion}}</p>
+
+<hr>
+
+<h3>Reseñas</h3>
+<ul>
+  {{#if reviews.length}}
+    {{#each reviews}}
+      <li>
+        <strong>{{this.usuario.nombre}}:</strong> "{{this.comentario}}" ({{this.calificacion}}⭐)
+      </li>
+    {{/each}}
+  {{else}}
+    <p>No hay reseñas todavía.</p>
+  {{/if}}
+</ul>
+
+<hr>
+
+<h3>Agregar reseña</h3>
+<form action="/restaurantes/review" method="POST">
+  <input type="hidden" name="restauranteId" value="{{restaurante._id}}">
+  <input type="hidden" name="restauranteNombre" value="{{restaurante.nombre}}">
+  <input type="hidden" name="usuarioId" value="671e8a6a2f0b123456789abc">
+
+  <label>Comentario:</label>
+  <textarea name="comentario" required></textarea>
+
+  <label>Calificación:</label>
+  <input type="number" name="calificacion" min="1" max="5" required>
+
+  <button type="submit">Enviar Reseña</button>
+</form>

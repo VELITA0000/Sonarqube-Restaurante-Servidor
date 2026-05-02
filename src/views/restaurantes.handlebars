@@ -1,0 +1,18 @@
+<h2>Buscar Restaurante</h2>
+<form action="/restaurantes" method="GET">
+  <input type="text" name="nombre" placeholder="Nombre del restaurante">
+  <button type="submit">Buscar</button>
+</form>
+
+{{#if notFound}}
+  <p>No se encontro ningún restaurante con ese nombre.</p>
+{{else}}
+  <h2>Lista de Restaurantes</h2>
+  <ul>
+    {{#each restaurantes}}
+      <li>
+        <strong>{{this.nombre}}</strong> - {{this.direccion}}
+      </li>
+    {{/each}}
+  </ul>
+{{/if}}
