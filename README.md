@@ -101,7 +101,26 @@ With github actions
 
 Generar token
 
-sqp_1502176a23e4d58400308b9a1d59e3b33f677bc0
+**Configurar Secrets en Github**  
+Repo - Settings - Secrets and variables - Actions - New repo secret
 
-**Configurar Secret en Github**     
-SONAR_TOKEN
+SONAR_TOKEN=token
+SONAR_HOST_URL=http://localhost:9000
+
+**Crear archivo YAML para Workflow**      
+JS/TS & Web
+
+**Crear archivo sonar-project.properties**   
+sonar.projectKey=llave-app-restaurantes
+
+**Crear .github/workflows/build.yml**    
+Copiar codigo de Sonarqube y pegarlo en el yml
+
+**Instalar SonarScanner**  
+npm install -g sonar-scanner
+
+sonar-scanner --version
+
+$env:SONAR_TOKEN="token"
+
+sonar-scanner "-Dsonar.login=$env:SONAR_TOKEN"
