@@ -102,16 +102,16 @@ With github actions
 Generar token
 
 **Configurar Secrets en Github**  
-Repo - Settings - Secrets and variables - Actions - New repo secret
+Repositorio → Settings → Secrets and variables → Actions → New repository secret
 
-SONAR_TOKEN=token
-SONAR_HOST_URL=http://localhost:9000
+- `SONAR_TOKEN`: token de análisis generado en tu instancia (SonarCloud o SonarQube Server).
+- `SONAR_HOST_URL` (opcional en GitHub si usas SonarQube Cloud): si no lo defines, el workflow usa `https://sonarcloud.io`. Si usas **SonarQube Server** en internet, define este secreto con la URL base pública. **No uses** `http://localhost:9000`: los runners no ven tu PC.
 
 **Crear archivo YAML para Workflow**      
 JS/TS & Web
 
-**Crear archivo sonar-project.properties**   
-sonar.projectKey=llave-app-restaurantes
+**Archivo sonar-project.properties** (en la raíz del repo)  
+Incluye `sonar.projectKey` y `sonar.sources`, etc. Para **SonarQube Cloud** debes añadir también `sonar.organization=<clave de tu organización>` (la ves en SonarCloud al crear o abrir el proyecto). Sin esa propiedad, el scanner asume SonarQube Server y acaba intentando `localhost:9000`. El token va en `SONAR_TOKEN`; la URL del host en CI va en el secreto opcional o en el valor por defecto del workflow.
 
 **Crear .github/workflows/build.yml**    
 Copiar codigo de Sonarqube y pegarlo en el yml
@@ -121,6 +121,12 @@ npm install -g sonar-scanner
 
 sonar-scanner --version
 
-$env:SONAR_TOKEN="token"
+Análisis en local contra Docker en `localhost:9000`:
 
-sonar-scanner "-Dsonar.login=$env:SONAR_TOKEN"
+```
+$env:SONAR_HOST_URL="http://localhost:9000"
+$env:SONAR_TOKEN="tu_token"
+sonar-scanner
+```
+
+El scanner usa `SONAR_TOKEN` y `SONAR_HOST_URL` del entorno (equivalente a las opciones de la acción de GitHub).

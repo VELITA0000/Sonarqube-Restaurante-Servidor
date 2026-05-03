@@ -15,10 +15,39 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Verify SonarQube Action secrets
+        shell: pwsh
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL_SECRET: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:SONAR_TOKEN)) {
+            Write-Error "SONAR_TOKEN no está definido o está vacío. Añade el secreto SONAR_TOKEN en Settings → Secrets and variables → Actions."
+            exit 1
+          }
+          $secretHost = $env:SONAR_HOST_URL_SECRET
+          if (-not [string]::IsNullOrWhiteSpace($secretHost)) {
+            try {
+              $u = [Uri]$secretHost.Trim()
+            } catch {
+              Write-Error "SONAR_HOST_URL no es una URL válida."
+              exit 1
+            }
+            $h = $u.Host.ToLowerInvariant()
+            if ($h -eq 'localhost' -or $h -eq '127.0.0.1' -or $h -eq '[::1]' -or $h -eq '::1') {
+              Write-Error @"
+          SONAR_HOST_URL apunta a loopback ($h). En GitHub Actions no existe SonarQube en tu PC.
+          Qué hacer: en Settings → Secrets → Actions, elimina el secreto SONAR_HOST_URL o cámbialo a la URL pública de tu servidor (no uses host local ni el puerto típico de Docker en tu máquina). Para SonarQube Cloud sin URL propia, borra ese secreto y el workflow usará sonarcloud.io.
+          "@
+              exit 1
+            }
+          } else {
+            Write-Host "SONAR_HOST_URL no definido: el scan usará https://sonarcloud.io (SonarQube Cloud). Para un servidor propio, define el secreto SONAR_HOST_URL."
+          }
       - uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL != '' && secrets.SONAR_HOST_URL || 'https://sonarcloud.io' }}
       # If you wish to fail your job when the Quality Gate is red, uncomment the
       # following lines. This would typically be used to fail a deployment.
       # - uses: SonarSource/sonarqube-quality-gate-action@v1
